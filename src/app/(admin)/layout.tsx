@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { AdminGuard, useAuth } from '@/features/auth';
@@ -40,6 +41,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const router = useRouter();
   const { profile, logout } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
+  const closeMobileMenu = () => setMobileMenuOpen(false);
 
   const handleBack = () => {
     if (typeof window !== 'undefined' && window.history.length > 1 && document.referrer.includes(window.location.host)) {
@@ -52,8 +57,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <AdminGuard>
       <div className="app-layout">
-        {/* Admin Sidebar */}
-        <aside className="sidebar" style={{ background: 'var(--n-0)' }}>
+        {/* Admin Sidebar (Desktop) */}
+        <aside className="sidebar desktop-sidebar" style={{ background: 'var(--n-0)' }}>
           <div className="sidebar-header flex-between">
             <Link href="/" className="sidebar-logo" title="Return to Landing Page">
               {APP_NAME}
@@ -114,14 +119,35 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: 'var(--sp-3) var(--sp-6)',
+            padding: 'var(--sp-3) var(--sp-4)',
             background: 'var(--n-0)',
             borderBottom: '1px solid var(--n-200)',
             position: 'sticky',
             top: 0,
-            zIndex: 10,
+            zIndex: 20,
           }}>
-            <div className="flex-gap-3">
+            <div className="flex-gap-2" style={{ alignItems: 'center' }}>
+              {/* Mobile Hamburger Button */}
+              <button
+                type="button"
+                onClick={toggleMobileMenu}
+                aria-label={mobileMenuOpen ? 'Close Admin Menu' : 'Open Admin Menu'}
+                style={{
+                  display: 'none',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '44px',
+                  height: '44px',
+                  fontSize: '20px',
+                  color: 'var(--n-950)',
+                  borderRadius: 'var(--radius-sm)',
+                  background: 'var(--n-100)',
+                }}
+                className="mobile-hamburger-btn"
+              >
+                {mobileMenuOpen ? '✕' : '☰'}
+              </button>
+
               <button
                 type="button"
                 className="btn btn-ghost btn-sm"
@@ -132,19 +158,95 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </button>
               <span style={{ color: 'var(--n-300)' }}>|</span>
               <Link href="/" className="btn btn-ghost btn-sm" style={{ fontSize: 'var(--text-xs)', color: 'var(--p-600)' }}>
-                🏠 Home Page
+                🏠 Home
               </Link>
             </div>
 
-            <div className="flex-gap-3">
-              <Link href="/dashboard" className="btn btn-secondary btn-sm" style={{ fontSize: 'var(--text-xs)' }}>
-                👤 Switch to Subscriber View
+            <div className="flex-gap-3" style={{ alignItems: 'center' }}>
+              <Link href="/dashboard" className="btn btn-secondary btn-sm desktop-only-btn" style={{ fontSize: 'var(--text-xs)' }}>
+                👤 Subscriber View
               </Link>
               <button onClick={logout} className="btn btn-ghost btn-sm" style={{ fontSize: 'var(--text-xs)', color: 'var(--d-500)' }}>
-                🏠 Leave &amp; Sign Out
+                🏠 Leave
               </button>
             </div>
           </header>
+
+          {/* Mobile Admin Navigation Drawer */}
+          {mobileMenuOpen && (
+            <div
+              style={{
+                position: 'fixed',
+                inset: 0,
+                top: '60px',
+                background: 'var(--n-50)',
+                zIndex: 100,
+                padding: 'var(--sp-6) var(--sp-4)',
+                overflowY: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--sp-4)',
+                borderBottom: '2px solid var(--n-200)',
+                boxShadow: 'var(--shadow-overlay)',
+              }}
+            >
+              <div className="sidebar-section-label">Admin Management Menu</div>
+              {ADMIN_NAV.map((section) => (
+                <div key={section.section} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 'var(--weight-bold)', color: 'var(--n-400)', textTransform: 'uppercase' }}>
+                    {section.section}
+                  </div>
+                  {section.items.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={closeMobileMenu}
+                      className={`sidebar-link ${
+                        pathname === item.href ? 'sidebar-link-active' : ''
+                      }`}
+                      style={{ minHeight: '44px' }}
+                    >
+                      <span className="sidebar-link-icon">{item.icon}</span>
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              ))}
+
+              <hr style={{ border: 'none', borderTop: '1px solid var(--n-200)', margin: 'var(--sp-2) 0' }} />
+
+              <Link
+                href="/dashboard"
+                onClick={closeMobileMenu}
+                className="btn btn-secondary btn-lg"
+                style={{ width: '100%' }}
+              >
+                👤 Switch to Subscriber View
+              </Link>
+              <button
+                onClick={() => { closeMobileMenu(); logout(); }}
+                className="btn btn-danger btn-lg"
+                style={{ width: '100%' }}
+              >
+                🏠 Sign Out &amp; Return to Home
+              </button>
+            </div>
+          )}
+
+          {/* Style block for responsive sidebar media queries */}
+          <style jsx>{`
+            @media (max-width: 767px) {
+              .desktop-sidebar {
+                display: none !important;
+              }
+              .mobile-hamburger-btn {
+                display: flex !important;
+              }
+              .desktop-only-btn {
+                display: none !important;
+              }
+            }
+          `}</style>
 
           <main className="main-content" style={{ flex: 1 }}>
             {children}
