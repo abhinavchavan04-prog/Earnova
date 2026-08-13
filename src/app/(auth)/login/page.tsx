@@ -50,6 +50,48 @@ export default function LoginPage() {
         Access your dashboard, micro-tasks, and calculated Nova Points.
       </p>
 
+      {/* Attractive & Visible Instant Demo Preview Section */}
+      <div
+        className="card"
+        style={{
+          background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(30, 41, 59, 0.5) 100%)',
+          borderColor: 'var(--p-400)',
+          boxShadow: '0 4px 20px rgba(212, 175, 55, 0.15)',
+          padding: 'var(--sp-4)',
+          marginBottom: 'var(--sp-6)',
+        }}
+      >
+        <div className="flex-between" style={{ marginBottom: 'var(--sp-2)' }}>
+          <span className="badge badge-primary" style={{ fontWeight: 'var(--weight-bold)', fontSize: 'var(--text-xs)' }}>
+            ✨ INSTANT PLATFORM PREVIEW
+          </span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--n-500)' }}>
+            No password required
+          </span>
+        </div>
+        <p style={{ fontSize: 'var(--text-xs)', color: 'var(--n-600)', marginBottom: 'var(--sp-3)', lineHeight: 'var(--leading-relaxed)' }}>
+          Experience live micro-tasks, accuracy scoring, and calculated wallet earnings without saving session.
+        </p>
+        <div className="flex-gap-2">
+          <button
+            type="button"
+            onClick={() => { demoSignIn('subscriber'); router.push('/dashboard'); }}
+            className="btn btn-primary btn-sm"
+            style={{ flex: 1, textTransform: 'none', fontWeight: 'var(--weight-semibold)' }}
+          >
+            ⚡ Test Subscriber View
+          </button>
+          <button
+            type="button"
+            onClick={() => { demoSignIn('admin'); router.push('/admin'); }}
+            className="btn btn-secondary btn-sm"
+            style={{ flex: 1, textTransform: 'none', fontWeight: 'var(--weight-semibold)' }}
+          >
+            ⬢ Test Admin Panel
+          </button>
+        </div>
+      </div>
+
       {error && (
         <div
           className="card"
@@ -147,18 +189,6 @@ export default function LoginPage() {
           Continue with Google
         </button>
       </form>
-
-      {/* Experience Platform Demo option for new visitors */}
-      <div style={{ marginTop: 'var(--sp-4)', textAlign: 'center', paddingTop: 'var(--sp-3)', borderTop: '1px solid var(--n-200)' }}>
-        <button
-          type="button"
-          onClick={() => { demoSignIn('subscriber'); router.push('/dashboard'); }}
-          className="btn btn-ghost btn-sm"
-          style={{ fontSize: 'var(--text-xs)', color: 'var(--p-600)' }}
-        >
-          ✨ Experience Platform Preview
-        </button>
-      </div>
 
       <div className="auth-footer">
         Don&apos;t have an account?{' '}

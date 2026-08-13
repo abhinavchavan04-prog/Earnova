@@ -235,12 +235,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
       await signInWithEmailAndPassword(auth, email, password);
     } catch (err: unknown) {
-      // If user is not created in Firebase Auth yet, try creating account automatically
       try {
         const cred = await createUserWithEmailAndPassword(auth, email, password);
         await updateProfile(cred.user, { displayName: email.split('@')[0] });
       } catch {
-        // Smooth seamless fallback if Firebase Auth is not active
         saveMockSession(mockUser, mockProfile, rememberMe);
         setUser(mockUser);
         setProfile(mockProfile);
@@ -330,11 +328,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Demo Sign-In: Always transient (rememberMe = false) so it NEVER saves to localStorage!
   const demoSignIn = (role: 'subscriber' | 'admin' = 'subscriber') => {
     setError(null);
     const demoProfile = role === 'admin' ? DEMO_ADMIN_PROFILE : DEMO_SUBSCRIBER_PROFILE;
     const mockUser = { uid: demoProfile.uid, email: demoProfile.email, displayName: demoProfile.displayName } as User;
-    saveMockSession(mockUser, demoProfile, true);
+    saveMockSession(mockUser, demoProfile, false); // Store only in sessionStorage, not localStorage
     setUser(mockUser);
     setProfile(demoProfile);
   };
