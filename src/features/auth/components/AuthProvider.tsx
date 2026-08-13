@@ -32,26 +32,29 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+// Default Admin Email specified by platform owner
+export const ADMIN_EMAIL = 'abhinavchavan04@gmail.com';
+
 const DEMO_SUBSCRIBER_PROFILE: UserProfile = {
   uid: 'demo_user_subscriber',
-  email: 'subscriber@earnova.demo',
-  displayName: 'Priya Sharma (Demo User)',
+  email: 'user@earnova.com',
+  displayName: 'Priya Sharma',
   role: ROLES.SUBSCRIBER,
   subscription: {
     status: SUB_STATUS.ACTIVE,
-    tier: TIERS.ADVANCED,
-    planId: 'plan_advanced_demo',
-    razorpaySubId: 'sub_demo_123',
+    tier: TIERS.BASIC, // Basic ₹999 plan — can do tasks, but withdrawal gated by Ultra (₹5,000)
+    planId: 'plan_basic_999',
+    razorpaySubId: 'sub_basic_123',
     startDate: new Date().toISOString(),
     renewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
   },
   wallet: {
-    balance: 1750000, // ₹17,500 = 1,750 NP
+    balance: 1750000, // ₹17,500 = 1,750 NP calculated earnings
     totalEarned: 2750000,
   },
   profile: {
-    skills: ['Graphic Design', 'Figma', 'UI/UX'],
-    categories: ['graphic_design', 'web_dev'],
+    skills: ['Graphic Design', 'Data Entry', 'Copywriting'],
+    categories: ['graphic_design', 'virtual_assistant'],
     kycStatus: KYC_STATUS.VERIFIED,
   },
   createdAt: new Date().toISOString(),
@@ -59,15 +62,15 @@ const DEMO_SUBSCRIBER_PROFILE: UserProfile = {
 };
 
 const DEMO_ADMIN_PROFILE: UserProfile = {
-  uid: 'demo_user_admin',
-  email: 'admin@earnova.demo',
-  displayName: 'Abhinav (Super Admin)',
+  uid: 'admin_user_abhinav',
+  email: ADMIN_EMAIL,
+  displayName: 'Abhinav Chavan (Super Admin)',
   role: ROLES.ADMIN,
   subscription: {
     status: SUB_STATUS.ACTIVE,
     tier: TIERS.ULTRA,
-    planId: 'plan_ultra_admin',
-    razorpaySubId: 'sub_admin_demo',
+    planId: 'plan_ultra_5000',
+    razorpaySubId: 'sub_admin_ultra',
     startDate: new Date().toISOString(),
     renewalDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
   },
@@ -76,7 +79,7 @@ const DEMO_ADMIN_PROFILE: UserProfile = {
     totalEarned: 10000000,
   },
   profile: {
-    skills: ['Platform Management', 'Operations'],
+    skills: ['Platform Management', 'Operations', 'Super Admin'],
     categories: ['graphic_design', 'web_dev', 'copywriting'],
     kycStatus: KYC_STATUS.VERIFIED,
   },
@@ -99,25 +102,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const docRef = doc(db, 'users', firebaseUser.uid);
       const docSnap = await getDoc(docRef);
 
+      const isAdminUser = firebaseUser.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+
       if (docSnap.exists()) {
-        setProfile(docSnap.data() as UserProfile);
+        const data = docSnap.data() as UserProfile;
+        // Ensure admin user always gets ADMIN role
+        if (isAdminUser && data.role !== ROLES.ADMIN) {
+          data.role = ROLES.ADMIN;
+        }
+        setProfile(data);
       } else {
         const newProfile: UserProfile = {
           uid: firebaseUser.uid,
           email: firebaseUser.email || '',
-          displayName: firebaseUser.displayName || '',
-          role: ROLES.SUBSCRIBER,
+          displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Subscriber',
+          role: isAdminUser ? ROLES.ADMIN : ROLES.SUBSCRIBER,
           subscription: {
-            status: SUB_STATUS.ACTIVE, // Default active for seamless onboarding
-            tier: TIERS.ADVANCED,
-            planId: 'plan_advanced',
+            status: SUB_STATUS.ACTIVE,
+            tier: isAdminUser ? TIERS.ULTRA : TIERS.BASIC,
+            planId: isAdminUser ? 'plan_ultra' : 'plan_basic',
             razorpaySubId: null,
             startDate: new Date().toISOString(),
             renewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
           },
           wallet: {
-            balance: 50000, // ₹500 initial bonus = 50 NP
-            totalEarned: 50000,
+            balance: 10000, // ₹100 welcome bonus = 10 NP
+            totalEarned: 10000,
           },
           profile: {
             skills: [],
@@ -143,7 +153,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Check if user session is stored in localStorage
-    const savedDemoRole = typeof window !== 'undefined' ? localStorage.getItem('earnova_demo_role') : null;
     const savedUserJson = typeof window !== 'undefined' ? localStorage.getItem('earnova_mock_user') : null;
 
     if (savedUserJson) {
@@ -156,18 +165,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch {
         localStorage.removeItem('earnova_mock_user');
       }
-    }
-
-    if (savedDemoRole === 'admin') {
-      setUser({ uid: DEMO_ADMIN_PROFILE.uid, email: DEMO_ADMIN_PROFILE.email, displayName: DEMO_ADMIN_PROFILE.displayName } as User);
-      setProfile(DEMO_ADMIN_PROFILE);
-      setLoading(false);
-      return;
-    } else if (savedDemoRole === 'subscriber') {
-      setUser({ uid: DEMO_SUBSCRIBER_PROFILE.uid, email: DEMO_SUBSCRIBER_PROFILE.email, displayName: DEMO_SUBSCRIBER_PROFILE.displayName } as User);
-      setProfile(DEMO_SUBSCRIBER_PROFILE);
-      setLoading(false);
-      return;
     }
 
     if (!isFirebaseConfigured) {
@@ -190,15 +187,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     setError(null);
+    const isAdminEmail = email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+
     if (!isFirebaseConfigured) {
-      // Seamless sign in fallback when real Firebase project is not linked yet
-      const isDemonstrationAdmin = email.toLowerCase().includes('admin');
-      const mockProfile: UserProfile = isDemonstrationAdmin
+      const mockProfile: UserProfile = isAdminEmail
         ? DEMO_ADMIN_PROFILE
         : {
             ...DEMO_SUBSCRIBER_PROFILE,
+            uid: 'user_' + Date.now(),
             email,
-            displayName: email.split('@')[0].toUpperCase(),
+            displayName: email.split('@')[0],
           };
 
       const mockUser = { uid: mockProfile.uid, email, displayName: mockProfile.displayName } as User;
@@ -221,23 +219,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string, name: string) => {
     setError(null);
+    const isAdminEmail = email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+
     if (!isFirebaseConfigured) {
-      // Seamless sign up fallback when real Firebase project is not linked yet
       const newMockProfile: UserProfile = {
         uid: 'user_' + Date.now(),
         email,
         displayName: name,
-        role: ROLES.SUBSCRIBER,
+        role: isAdminEmail ? ROLES.ADMIN : ROLES.SUBSCRIBER,
         subscription: {
           status: SUB_STATUS.ACTIVE,
-          tier: TIERS.ADVANCED,
-          planId: 'plan_advanced',
+          tier: isAdminEmail ? TIERS.ULTRA : TIERS.BASIC,
+          planId: isAdminEmail ? 'plan_ultra' : 'plan_basic',
           razorpaySubId: null,
           startDate: new Date().toISOString(),
           renewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         },
         wallet: {
-          balance: 10000, // ₹100 welcome bonus = 10 NP
+          balance: 10000, // ₹100 bonus = 10 NP
           totalEarned: 10000,
         },
         profile: {
@@ -273,14 +272,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!isFirebaseConfigured) {
       const googleUser = {
         uid: 'google_user_' + Date.now(),
-        email: 'google.user@example.com',
-        displayName: 'Google Demo User',
+        email: 'user@example.com',
+        displayName: 'Subscriber User',
       } as User;
       const googleProfile: UserProfile = {
         ...DEMO_SUBSCRIBER_PROFILE,
         uid: googleUser.uid,
         email: googleUser.email || '',
-        displayName: googleUser.displayName || 'Google Demo User',
+        displayName: googleUser.displayName || 'Subscriber User',
       };
       if (typeof window !== 'undefined') {
         localStorage.setItem('earnova_mock_user', JSON.stringify({ user: googleUser, profile: googleProfile }));
@@ -304,8 +303,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setError(null);
     const demoProfile = role === 'admin' ? DEMO_ADMIN_PROFILE : DEMO_SUBSCRIBER_PROFILE;
     if (typeof window !== 'undefined') {
-      localStorage.setItem('earnova_demo_role', role);
-      localStorage.removeItem('earnova_mock_user');
+      localStorage.setItem('earnova_mock_user', JSON.stringify({
+        user: { uid: demoProfile.uid, email: demoProfile.email, displayName: demoProfile.displayName },
+        profile: demoProfile
+      }));
     }
     setUser({ uid: demoProfile.uid, email: demoProfile.email, displayName: demoProfile.displayName } as User);
     setProfile(demoProfile);
@@ -313,7 +314,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('earnova_demo_role');
       localStorage.removeItem('earnova_mock_user');
     }
     if (isFirebaseConfigured) {

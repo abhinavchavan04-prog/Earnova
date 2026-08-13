@@ -15,7 +15,7 @@ export default function LoginPage() {
 
   // Redirect if already logged in
   if (user && !loading) {
-    router.push('/dashboard');
+    router.push(user.email === 'abhinavchavan04@gmail.com' ? '/admin' : '/dashboard');
     return null;
   }
 
@@ -24,7 +24,7 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       await signIn(email, password);
-      router.push('/dashboard');
+      router.push(email.toLowerCase() === 'abhinavchavan04@gmail.com' ? '/admin' : '/dashboard');
     } catch {
       // Error is handled by AuthProvider
     } finally {
@@ -41,41 +41,18 @@ export default function LoginPage() {
     }
   };
 
-  const handleDemoSubscriber = () => {
-    demoSignIn('subscriber');
-    router.push('/dashboard');
-  };
-
-  const handleDemoAdmin = () => {
-    demoSignIn('admin');
-    router.push('/admin');
+  const handleAdminPrefill = () => {
+    setEmail('abhinavchavan04@gmail.com');
+    setPassword('admin123456');
   };
 
   return (
     <div className="auth-card">
       <div className="auth-brand">{APP_NAME}</div>
-      <h2 className="auth-heading">Welcome back</h2>
+      <h2 className="auth-heading">Sign In to Earnova</h2>
       <p className="auth-subtext">
-        Sign in to access your dashboard and earnings.
+        Access your dashboard, micro-tasks, and calculated Nova Points.
       </p>
-
-      {/* Demo Sign In Quick Access */}
-      <div className="card" style={{ background: 'var(--p-50)', borderColor: 'var(--p-300)', marginBottom: 'var(--sp-5)', padding: 'var(--sp-4)' }}>
-        <div style={{ fontSize: 'var(--text-xs)', fontWeight: 'var(--weight-semibold)', color: 'var(--p-600)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--sp-2)' }}>
-          ⚡ Quick Demo Mode
-        </div>
-        <p style={{ fontSize: 'var(--text-xs)', color: 'var(--n-600)', marginBottom: 'var(--sp-3)' }}>
-          Test the entire platform instantly without configuring Firebase Auth.
-        </p>
-        <div className="flex-gap-2">
-          <button type="button" className="btn btn-primary btn-sm" onClick={handleDemoSubscriber} style={{ flex: 1 }}>
-            Demo Subscriber
-          </button>
-          <button type="button" className="btn btn-secondary btn-sm" onClick={handleDemoAdmin} style={{ flex: 1 }}>
-            Demo Admin Panel
-          </button>
-        </div>
-      </div>
 
       {error && (
         <div
@@ -102,9 +79,14 @@ export default function LoginPage() {
 
       <form className="auth-form" onSubmit={handleSubmit}>
         <div className="input-group">
-          <label className="input-label" htmlFor="email">
-            Email
-          </label>
+          <div className="flex-between">
+            <label className="input-label" htmlFor="email">
+              Email Address
+            </label>
+            <button type="button" onClick={handleAdminPrefill} className="btn btn-ghost btn-sm" style={{ fontSize: 'var(--text-xs)', color: 'var(--p-600)' }}>
+              ⚡ Fill Super Admin Email
+            </button>
+          </div>
           <input
             id="email"
             type="email"
@@ -160,6 +142,18 @@ export default function LoginPage() {
           Continue with Google
         </button>
       </form>
+
+      {/* Subtle preview links */}
+      <div style={{ marginTop: 'var(--sp-4)', textAlign: 'center', paddingTop: 'var(--sp-3)', borderTop: '1px solid var(--n-200)' }}>
+        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--n-500)' }}>Instant preview: </span>
+        <button type="button" onClick={() => { demoSignIn('subscriber'); router.push('/dashboard'); }} className="btn btn-ghost btn-sm" style={{ fontSize: 'var(--text-xs)' }}>
+          Subscriber View
+        </button>
+        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--n-500)' }}>·</span>
+        <button type="button" onClick={() => { demoSignIn('admin'); router.push('/admin'); }} className="btn btn-ghost btn-sm" style={{ fontSize: 'var(--text-xs)' }}>
+          Admin Panel
+        </button>
+      </div>
 
       <div className="auth-footer">
         Don&apos;t have an account?{' '}
