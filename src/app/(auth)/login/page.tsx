@@ -9,6 +9,9 @@ import { APP_NAME } from '@/lib/constants';
 export default function LoginPage() {
   const { signIn, signInWithGoogle, demoSignIn, logout, error, clearError, user } = useAuth();
   const router = useRouter();
+
+  // Login Mode State: 'subscriber' | 'admin'
+  const [loginMode, setLoginMode] = useState<'subscriber' | 'admin'>('subscriber');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
@@ -19,7 +22,8 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       await signIn(email, password, rememberMe);
-      router.push(email.toLowerCase() === 'abhinavchavan04@gmail.com' ? '/admin' : '/dashboard');
+      const isAdmin = email.toLowerCase() === 'abhinavchavan04@gmail.com' || loginMode === 'admin';
+      router.push(isAdmin ? '/admin' : '/dashboard');
     } catch {
       // Error handled cleanly
     } finally {
@@ -27,10 +31,15 @@ export default function LoginPage() {
     }
   };
 
+  const handleAdminQuickFill = () => {
+    setEmail('abhinavchavan04@gmail.com');
+    setPassword('admin123456');
+  };
+
   const handleGoogle = async () => {
     try {
       await signInWithGoogle(rememberMe);
-      router.push('/dashboard');
+      router.push(loginMode === 'admin' ? '/admin' : '/dashboard');
     } catch {
       // Error handled cleanly
     }
@@ -39,12 +48,62 @@ export default function LoginPage() {
   return (
     <div className="auth-card">
       <div className="auth-brand">{APP_NAME}</div>
-      <h2 className="auth-heading">Sign In to Earnova</h2>
+
+      {/* Admin / Subscriber Mode Toggle Tabs */}
+      <div
+        style={{
+          display: 'flex',
+          background: 'var(--n-100)',
+          borderRadius: 'var(--radius-full)',
+          padding: '4px',
+          marginBottom: 'var(--sp-6)',
+          border: '1px solid var(--n-150)',
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => { setLoginMode('subscriber'); setEmail(''); }}
+          style={{
+            flex: 1,
+            padding: 'var(--sp-2) var(--sp-3)',
+            borderRadius: 'var(--radius-full)',
+            fontSize: 'var(--text-xs)',
+            fontWeight: 'var(--weight-semibold)',
+            background: loginMode === 'subscriber' ? 'var(--n-900)' : 'transparent',
+            color: loginMode === 'subscriber' ? 'var(--n-50)' : 'var(--n-600)',
+            transition: 'all 150ms ease',
+          }}
+        >
+          👤 Subscriber Login
+        </button>
+        <button
+          type="button"
+          onClick={() => { setLoginMode('admin'); handleAdminQuickFill(); }}
+          style={{
+            flex: 1,
+            padding: 'var(--sp-2) var(--sp-3)',
+            borderRadius: 'var(--radius-full)',
+            fontSize: 'var(--text-xs)',
+            fontWeight: 'var(--weight-semibold)',
+            background: loginMode === 'admin' ? 'var(--n-900)' : 'transparent',
+            color: loginMode === 'admin' ? 'var(--n-50)' : 'var(--n-600)',
+            transition: 'all 150ms ease',
+          }}
+        >
+          🛡️ Admin Portal Login
+        </button>
+      </div>
+
+      <h2 className="auth-heading">
+        {loginMode === 'admin' ? '🛡️ Administrator Portal' : 'Sign In to Earnova'}
+      </h2>
       <p className="auth-subtext">
-        Access your dashboard, micro-tasks, and calculated Nova Points.
+        {loginMode === 'admin'
+          ? 'Manage users, review Bucket 1 & 2 task queues, and process payouts.'
+          : 'Access your subscriber dashboard, micro-tasks, and wallet earnings.'}
       </p>
 
-      {/* If already signed in banner — allows user to continue or switch account */}
+      {/* If already signed in banner */}
       {user && (
         <div
           className="card"
@@ -79,29 +138,29 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* Instant Demo Preview Section */}
-      <div
-        className="card"
-        style={{
-          background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(30, 41, 59, 0.5) 100%)',
-          borderColor: 'var(--p-400)',
-          boxShadow: '0 4px 20px rgba(212, 175, 55, 0.15)',
-          padding: 'var(--sp-4)',
-          marginBottom: 'var(--sp-6)',
-        }}
-      >
-        <div className="flex-between" style={{ marginBottom: 'var(--sp-2)' }}>
-          <span className="badge badge-primary" style={{ fontWeight: 'var(--weight-bold)', fontSize: 'var(--text-xs)' }}>
-            ✨ INSTANT PLATFORM PREVIEW
-          </span>
-          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--n-500)' }}>
-            No password required
-          </span>
-        </div>
-        <p style={{ fontSize: 'var(--text-xs)', color: 'var(--n-600)', marginBottom: 'var(--sp-3)', lineHeight: 'var(--leading-relaxed)' }}>
-          Experience live micro-tasks, accuracy scoring, and calculated wallet earnings without saving session.
-        </p>
-        <div className="flex-gap-2">
+      {/* Instant Demo Preview Section (Subscriber only) */}
+      {loginMode === 'subscriber' && (
+        <div
+          className="card"
+          style={{
+            background: 'var(--n-100)',
+            borderColor: 'var(--n-200)',
+            boxShadow: 'var(--shadow-raised)',
+            padding: 'var(--sp-4)',
+            marginBottom: 'var(--sp-6)',
+          }}
+        >
+          <div className="flex-between" style={{ marginBottom: 'var(--sp-2)' }}>
+            <span className="badge badge-primary" style={{ fontWeight: 'var(--weight-bold)', fontSize: 'var(--text-xs)' }}>
+              ✨ INSTANT PLATFORM PREVIEW
+            </span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--n-500)' }}>
+              No password required
+            </span>
+          </div>
+          <p style={{ fontSize: 'var(--text-xs)', color: 'var(--n-600)', marginBottom: 'var(--sp-3)', lineHeight: 'var(--leading-relaxed)' }}>
+            Experience live micro-tasks, accuracy scoring, and calculated wallet earnings without saving session.
+          </p>
           <button
             type="button"
             onClick={() => { demoSignIn('subscriber'); router.push('/dashboard'); }}
@@ -111,7 +170,32 @@ export default function LoginPage() {
             ⚡ Test Subscriber View
           </button>
         </div>
-      </div>
+      )}
+
+      {/* Admin Mode Shortcut Helper */}
+      {loginMode === 'admin' && (
+        <div
+          className="card"
+          style={{
+            background: 'var(--w-50)',
+            borderColor: 'var(--w-200)',
+            marginBottom: 'var(--sp-5)',
+            padding: 'var(--sp-4)',
+          }}
+        >
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--w-700)', fontWeight: 'var(--weight-semibold)', marginBottom: 'var(--sp-2)' }}>
+            🔑 Administrator Credentials Shortcut:
+          </div>
+          <button
+            type="button"
+            onClick={handleAdminQuickFill}
+            className="btn btn-secondary btn-sm"
+            style={{ width: '100%', background: 'var(--n-50)', color: 'var(--n-950)' }}
+          >
+            Auto-fill Admin Email (abhinavchavan04@gmail.com)
+          </button>
+        </div>
+      )}
 
       {error && (
         <div
@@ -139,13 +223,13 @@ export default function LoginPage() {
       <form className="auth-form" onSubmit={handleSubmit}>
         <div className="input-group">
           <label className="input-label" htmlFor="email">
-            Email Address
+            {loginMode === 'admin' ? 'Admin Email Address' : 'Email Address'}
           </label>
           <input
             id="email"
             type="email"
             className="input"
-            placeholder="you@example.com"
+            placeholder={loginMode === 'admin' ? 'abhinavchavan04@gmail.com' : 'you@example.com'}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -190,7 +274,7 @@ export default function LoginPage() {
           disabled={submitting}
           style={{ width: '100%' }}
         >
-          Sign in
+          {loginMode === 'admin' ? 'Sign in to Admin Portal' : 'Sign in'}
         </button>
 
         <div className="auth-divider">or</div>
