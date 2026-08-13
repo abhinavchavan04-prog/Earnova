@@ -39,8 +39,8 @@ const DEMO_SUBSCRIBER_PROFILE: UserProfile = {
   role: ROLES.SUBSCRIBER,
   subscription: {
     status: SUB_STATUS.ACTIVE,
-    tier: TIERS.PRO,
-    planId: 'plan_pro_demo',
+    tier: TIERS.ADVANCED,
+    planId: 'plan_advanced_demo',
     razorpaySubId: 'sub_demo_123',
     startDate: new Date().toISOString(),
     renewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
@@ -65,8 +65,8 @@ const DEMO_ADMIN_PROFILE: UserProfile = {
   role: ROLES.ADMIN,
   subscription: {
     status: SUB_STATUS.ACTIVE,
-    tier: TIERS.PRO,
-    planId: 'plan_pro_admin',
+    tier: TIERS.ULTRA,
+    planId: 'plan_ultra_admin',
     razorpaySubId: 'sub_admin_demo',
     startDate: new Date().toISOString(),
     renewalDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),

@@ -5,8 +5,8 @@ import { TIERS } from '@/lib/constants';
 
 const MOCK_CONTENT = [
   { id: '1', title: 'Print-on-Demand: Complete Guide to Earning on Etsy & Redbubble', type: 'guide', category: 'POD', unlockTier: TIERS.BASIC, isPublished: true, description: 'Step-by-step guide covering niche research, design creation, platform setup, SEO optimization, and scaling your POD business.' },
-  { id: '2', title: 'Freelance Copywriting: From Zero to First Client', type: 'guide', category: 'Copywriting', unlockTier: TIERS.PRO, isPublished: true, description: 'Learn how to write compelling copy, find clients, price your services, and build a portfolio without previous experience.' },
-  { id: '3', title: 'Social Media Management: Building a Client-Ready Service', type: 'course', category: 'SMM', unlockTier: TIERS.PRO, isPublished: true, description: 'Complete course on content strategy, scheduling tools, analytics reporting, and client management for social media managers.' },
+  { id: '2', title: 'Freelance Copywriting: From Zero to First Client', type: 'guide', category: 'Copywriting', unlockTier: TIERS.ADVANCED, isPublished: true, description: 'Learn how to write compelling copy, find clients, price your services, and build a portfolio without previous experience.' },
+  { id: '3', title: 'Social Media Management: Building a Client-Ready Service', type: 'course', category: 'SMM', unlockTier: TIERS.ADVANCED, isPublished: true, description: 'Complete course on content strategy, scheduling tools, analytics reporting, and client management for social media managers.' },
   { id: '4', title: 'Data Labeling for AI: Understanding the Opportunity', type: 'guide', category: 'AI', unlockTier: TIERS.BASIC, isPublished: true, description: 'Overview of AI data labeling as an earning category — what it is, what platforms pay, and how to qualify for higher-paying tasks.' },
 ];
 
@@ -16,7 +16,7 @@ export default function LearnPage() {
 
   const canAccess = (contentTier: string) => {
     if (!userTier) return false;
-    if (userTier === TIERS.PRO) return true;
+    if (userTier === TIERS.ADVANCED || userTier === TIERS.ULTRA) return true;
     return contentTier === TIERS.BASIC;
   };
 
