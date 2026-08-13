@@ -1,4 +1,4 @@
-import { CURRENCY } from '@/lib/constants';
+import { CURRENCY, POINTS_CONFIG } from '@/lib/constants';
 
 /**
  * Format a number in paise to a readable INR string.
@@ -15,6 +15,42 @@ export function formatCurrency(paise: number, showDecimals = true): string {
     }).format(amount);
   }
   return `${CURRENCY.symbol}${new Intl.NumberFormat(CURRENCY.locale).format(Math.floor(amount))}`;
+}
+
+/**
+ * Convert paise (100 paise = ₹1) to Nova Points (10 NP = ₹1).
+ * paiseToPoints(2500) → 250 NP (since ₹25 = 250 NP)
+ */
+export function paiseToPoints(paise: number): number {
+  const rupees = paise / 100;
+  return Math.round(rupees * POINTS_CONFIG.pointsPerRupee);
+}
+
+/**
+ * Convert Nova Points to paise.
+ * pointsToPaise(250) → 2500 paise (₹25)
+ */
+export function pointsToPaise(points: number): number {
+  const rupees = points / POINTS_CONFIG.pointsPerRupee;
+  return Math.round(rupees * 100);
+}
+
+/**
+ * Format Nova Points.
+ * formatPoints(250) → "250 NP"
+ */
+export function formatPoints(points: number): string {
+  return `${new Intl.NumberFormat().format(points)} ${POINTS_CONFIG.symbol}`;
+}
+
+/**
+ * Format Nova Points with INR equivalent.
+ * formatPointsWithInr(250) → "250 NP (≈ ₹25)"
+ */
+export function formatPointsWithInr(points: number): string {
+  const rupees = points / POINTS_CONFIG.pointsPerRupee;
+  const inrStr = formatCurrency(rupees * 100, false);
+  return `${new Intl.NumberFormat().format(points)} ${POINTS_CONFIG.symbol} (≈ ${inrStr})`;
 }
 
 /**

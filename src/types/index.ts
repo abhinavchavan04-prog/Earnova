@@ -71,20 +71,27 @@ export interface TaskOffer {
   title: string;
   description: string;
   payoutAmount: number; // in paise
+  pointsReward: number; // in Nova Points (10 NP = ₹1)
   externalOfferId?: string;
   partnerUrl?: string;
   partnerId?: string;
   isActive: boolean;
+  isVisible: boolean; // Admin show/hide toggle
+  isFeatured?: boolean; // Highlighted offer
   createdAt: string;
 }
 
 export interface TaskCompletion {
   id: string;
   userId: string;
+  userName?: string;
   offerId: string;
   categoryId: string;
   status: TaskCompletionStatus;
   evidence?: string; // URL or text for manual review
+  submittedData?: Record<string, string>; // Form/data entry submitted key-values
+  accuracyScore?: number; // 0-100 percentage accuracy
+  mistakesFound?: string[]; // Specific errors identified (e.g. "Missing area code", "Invalid GST number")
   rejectionReason?: string;
   completedAt: string;
   verifiedAt?: string;

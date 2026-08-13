@@ -14,26 +14,39 @@ export const PLANS = {
   basic: {
     id: process.env.RAZORPAY_PLAN_BASIC_ID || 'plan_basic_placeholder',
     name: 'Basic',
-    price: 29900, // in paise (₹299)
+    price: 99900, // in paise (₹999)
     interval: 'monthly' as const,
     features: [
-      'Bucket 1 — All micro-tasks',
-      'Learn & Earn — Basic content',
-      'In-platform wallet',
+      'Bucket 1 — Micro-tasks & Data Filling',
+      'Nova Points Earning (10 NP = ₹1)',
+      'Learn & Earn — Basic guides',
       'Standard payouts',
     ],
   },
-  pro: {
-    id: process.env.RAZORPAY_PLAN_PRO_ID || 'plan_pro_placeholder',
-    name: 'Pro',
-    price: 79900, // in paise (₹799)
+  advanced: {
+    id: process.env.RAZORPAY_PLAN_ADVANCED_ID || 'plan_advanced_placeholder',
+    name: 'Advanced',
+    price: 199900, // in paise (₹1,999)
     interval: 'monthly' as const,
     features: [
       'Everything in Basic',
-      'Bucket 2 — All freelance jobs',
-      'Learn & Earn — All content',
-      'Priority payouts',
-      'Priority job access',
+      'Bucket 2 — All Freelance Agency Jobs',
+      'Learn & Earn — All courses & guides',
+      'Priority Payout Processing',
+      'Priority Job Claiming',
+    ],
+  },
+  ultra: {
+    id: process.env.RAZORPAY_PLAN_ULTRA_ID || 'plan_ultra_placeholder',
+    name: 'Ultra',
+    price: 500000, // in paise (₹5,000)
+    interval: 'monthly' as const,
+    features: [
+      'Everything in Advanced',
+      'High-Ticket Client Project Access',
+      'Dedicated Account Manager',
+      'Instant Payout Approvals',
+      'Custom Agency Support & Direct Leads',
     ],
   },
 } as const;

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useAuth } from '@/features/auth';
-import { formatCurrency } from '@/utils/format';
+import { formatCurrency, paiseToPoints } from '@/utils/format';
 import { SUB_STATUS, TASK_TYPES } from '@/lib/constants';
 
 // Mock data for initial UI — will be replaced with Firestore queries
@@ -63,22 +63,28 @@ export default function DashboardPage() {
         <div className="wallet-card">
           <div className="wallet-label">Wallet balance</div>
           <div className="wallet-balance">
-            {formatCurrency(profile?.wallet?.balance || 0, false)}
+            {paiseToPoints(profile?.wallet?.balance || 0)} NP
+          </div>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--n-500)', marginTop: 'var(--sp-1)' }}>
+            ≈ {formatCurrency(profile?.wallet?.balance || 0, false)}
           </div>
         </div>
         <div className="metric-card">
           <div className="metric-card-label">Total earned</div>
           <div className="metric-card-value">
-            {formatCurrency(profile?.wallet?.totalEarned || 0, false)}
+            {paiseToPoints(profile?.wallet?.totalEarned || 0)} NP
+          </div>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--n-500)', marginTop: 'var(--sp-1)' }}>
+            ≈ {formatCurrency(profile?.wallet?.totalEarned || 0, false)}
           </div>
         </div>
         <div className="metric-card">
           <div className="metric-card-label">Tasks completed</div>
-          <div className="metric-card-value">0</div>
+          <div className="metric-card-value">3</div>
         </div>
         <div className="metric-card">
           <div className="metric-card-label">Jobs delivered</div>
-          <div className="metric-card-value">0</div>
+          <div className="metric-card-value">1</div>
         </div>
       </div>
 

@@ -4,8 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { AuthGuard, useAuth } from '@/features/auth';
 import { APP_NAME, SUB_STATUS } from '@/lib/constants';
-import { formatCurrency } from '@/utils/format';
-import { getInitials } from '@/utils/format';
+import { formatCurrency, paiseToPoints, getInitials } from '@/utils/format';
 
 const NAV_ITEMS = [
   { label: 'Dashboard', href: '/dashboard', icon: '◆' },
@@ -74,8 +73,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <div style={{ fontSize: 'var(--text-xs)', color: 'var(--n-500)', marginBottom: 'var(--sp-1)' }}>
                   Wallet Balance
                 </div>
-                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 'var(--weight-bold)', color: 'var(--p-600)' }}>
-                  {formatCurrency(profile.wallet?.balance || 0, false)}
+                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 'var(--weight-bold)', color: 'var(--p-600)', fontSize: 'var(--text-md)' }}>
+                  {paiseToPoints(profile.wallet?.balance || 0)} NP
+                </div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--n-500)' }}>
+                  ≈ {formatCurrency(profile.wallet?.balance || 0, false)}
                 </div>
               </div>
             )}

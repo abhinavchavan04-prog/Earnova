@@ -15,7 +15,8 @@ export type UserRole = (typeof ROLES)[keyof typeof ROLES];
 // Subscription tiers
 export const TIERS = {
   BASIC: 'basic',
-  PRO: 'pro',
+  ADVANCED: 'advanced',
+  ULTRA: 'ultra',
 } as const;
 
 export type SubscriptionTier = (typeof TIERS)[keyof typeof TIERS];
@@ -183,9 +184,17 @@ export const MIN_PAYOUT_AMOUNT = 50000; // ₹500
 // Default platform margin for Bucket 2
 export const DEFAULT_PLATFORM_MARGIN_PERCENT = 30;
 
-// Currency formatting
+// Currency & Points formatting
 export const CURRENCY = {
   code: 'INR',
   symbol: '₹',
   locale: 'en-IN',
 };
+
+// Points system: 10 Nova Points = ₹1.00 (100 paise)
+export const POINTS_CONFIG = {
+  name: 'Nova Points',
+  symbol: 'NP',
+  pointsPerRupee: 10, // 10 NP = ₹1
+};
+
