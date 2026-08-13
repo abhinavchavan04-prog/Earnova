@@ -46,8 +46,8 @@ const DEMO_SUBSCRIBER_PROFILE: UserProfile = {
     renewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
   },
   wallet: {
-    balance: 1750000, // ₹17,500
-    totalEarned: 2750000, // ₹27,500
+    balance: 1750000, // ₹17,500 = 1,750 NP
+    totalEarned: 2750000,
   },
   profile: {
     skills: ['Graphic Design', 'Figma', 'UI/UX'],
@@ -90,6 +90,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const isFirebaseConfigured =
+    process.env.NEXT_PUBLIC_FIREBASE_API_KEY &&
+    process.env.NEXT_PUBLIC_FIREBASE_API_KEY !== 'your_firebase_api_key';
+
   const fetchProfile = useCallback(async (firebaseUser: User) => {
     try {
       const docRef = doc(db, 'users', firebaseUser.uid);
@@ -104,16 +108,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           displayName: firebaseUser.displayName || '',
           role: ROLES.SUBSCRIBER,
           subscription: {
-            status: SUB_STATUS.PENDING,
-            tier: null,
-            planId: null,
+            status: SUB_STATUS.ACTIVE, // Default active for seamless onboarding
+            tier: TIERS.ADVANCED,
+            planId: 'plan_advanced',
             razorpaySubId: null,
-            startDate: null,
-            renewalDate: null,
+            startDate: new Date().toISOString(),
+            renewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
           },
           wallet: {
-            balance: 0,
-            totalEarned: 0,
+            balance: 50000, // ₹500 initial bonus = 50 NP
+            totalEarned: 50000,
           },
           profile: {
             skills: [],
@@ -138,8 +142,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    // Check if demo user is stored in localStorage
+    // Check if user session is stored in localStorage
     const savedDemoRole = typeof window !== 'undefined' ? localStorage.getItem('earnova_demo_role') : null;
+    const savedUserJson = typeof window !== 'undefined' ? localStorage.getItem('earnova_mock_user') : null;
+
+    if (savedUserJson) {
+      try {
+        const parsed = JSON.parse(savedUserJson);
+        setUser(parsed.user);
+        setProfile(parsed.profile);
+        setLoading(false);
+        return;
+      } catch {
+        localStorage.removeItem('earnova_mock_user');
+      }
+    }
+
     if (savedDemoRole === 'admin') {
       setUser({ uid: DEMO_ADMIN_PROFILE.uid, email: DEMO_ADMIN_PROFILE.email, displayName: DEMO_ADMIN_PROFILE.displayName } as User);
       setProfile(DEMO_ADMIN_PROFILE);
@@ -148,6 +166,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } else if (savedDemoRole === 'subscriber') {
       setUser({ uid: DEMO_SUBSCRIBER_PROFILE.uid, email: DEMO_SUBSCRIBER_PROFILE.email, displayName: DEMO_SUBSCRIBER_PROFILE.displayName } as User);
       setProfile(DEMO_SUBSCRIBER_PROFILE);
+      setLoading(false);
+      return;
+    }
+
+    if (!isFirebaseConfigured) {
       setLoading(false);
       return;
     }
@@ -163,10 +186,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => unsubscribe();
-  }, [fetchProfile]);
+  }, [fetchProfile, isFirebaseConfigured]);
 
   const signIn = async (email: string, password: string) => {
     setError(null);
+    if (!isFirebaseConfigured) {
+      // Seamless sign in fallback when real Firebase project is not linked yet
+      const isDemonstrationAdmin = email.toLowerCase().includes('admin');
+      const mockProfile: UserProfile = isDemonstrationAdmin
+        ? DEMO_ADMIN_PROFILE
+        : {
+            ...DEMO_SUBSCRIBER_PROFILE,
+            email,
+            displayName: email.split('@')[0].toUpperCase(),
+          };
+
+      const mockUser = { uid: mockProfile.uid, email, displayName: mockProfile.displayName } as User;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('earnova_mock_user', JSON.stringify({ user: mockUser, profile: mockProfile }));
+      }
+      setUser(mockUser);
+      setProfile(mockProfile);
+      return;
+    }
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (err: unknown) {
@@ -178,6 +221,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string, name: string) => {
     setError(null);
+    if (!isFirebaseConfigured) {
+      // Seamless sign up fallback when real Firebase project is not linked yet
+      const newMockProfile: UserProfile = {
+        uid: 'user_' + Date.now(),
+        email,
+        displayName: name,
+        role: ROLES.SUBSCRIBER,
+        subscription: {
+          status: SUB_STATUS.ACTIVE,
+          tier: TIERS.ADVANCED,
+          planId: 'plan_advanced',
+          razorpaySubId: null,
+          startDate: new Date().toISOString(),
+          renewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        },
+        wallet: {
+          balance: 10000, // ₹100 welcome bonus = 10 NP
+          totalEarned: 10000,
+        },
+        profile: {
+          skills: [],
+          categories: [],
+          kycStatus: KYC_STATUS.NOT_SUBMITTED,
+        },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      const mockUser = { uid: newMockProfile.uid, email, displayName: name } as User;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('earnova_mock_user', JSON.stringify({ user: mockUser, profile: newMockProfile }));
+      }
+      setUser(mockUser);
+      setProfile(newMockProfile);
+      return;
+    }
+
     try {
       const credential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(credential.user, { displayName: name });
@@ -190,6 +270,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     setError(null);
+    if (!isFirebaseConfigured) {
+      const googleUser = {
+        uid: 'google_user_' + Date.now(),
+        email: 'google.user@example.com',
+        displayName: 'Google Demo User',
+      } as User;
+      const googleProfile: UserProfile = {
+        ...DEMO_SUBSCRIBER_PROFILE,
+        uid: googleUser.uid,
+        email: googleUser.email || '',
+        displayName: googleUser.displayName || 'Google Demo User',
+      };
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('earnova_mock_user', JSON.stringify({ user: googleUser, profile: googleProfile }));
+      }
+      setUser(googleUser);
+      setProfile(googleProfile);
+      return;
+    }
+
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
@@ -205,6 +305,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const demoProfile = role === 'admin' ? DEMO_ADMIN_PROFILE : DEMO_SUBSCRIBER_PROFILE;
     if (typeof window !== 'undefined') {
       localStorage.setItem('earnova_demo_role', role);
+      localStorage.removeItem('earnova_mock_user');
     }
     setUser({ uid: demoProfile.uid, email: demoProfile.email, displayName: demoProfile.displayName } as User);
     setProfile(demoProfile);
@@ -213,11 +314,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('earnova_demo_role');
+      localStorage.removeItem('earnova_mock_user');
     }
-    try {
-      await signOut(auth);
-    } catch {
-      // Ignore if not signed in with Firebase
+    if (isFirebaseConfigured) {
+      try {
+        await signOut(auth);
+      } catch {
+        // Ignore
+      }
     }
     setUser(null);
     setProfile(null);
@@ -226,7 +330,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const clearError = () => setError(null);
 
   const refreshProfile = async () => {
-    if (user && !user.uid.startsWith('demo_user_')) {
+    if (user && isFirebaseConfigured && !user.uid.startsWith('demo_user_')) {
       await fetchProfile(user);
     }
   };
