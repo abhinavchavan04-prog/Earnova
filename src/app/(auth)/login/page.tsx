@@ -106,17 +106,9 @@ export default function LoginPage() {
             type="button"
             onClick={() => { demoSignIn('subscriber'); router.push('/dashboard'); }}
             className="btn btn-primary btn-sm"
-            style={{ flex: 1, textTransform: 'none', fontWeight: 'var(--weight-semibold)' }}
+            style={{ width: '100%', textTransform: 'none', fontWeight: 'var(--weight-semibold)' }}
           >
             ⚡ Test Subscriber View
-          </button>
-          <button
-            type="button"
-            onClick={() => { demoSignIn('admin'); router.push('/admin'); }}
-            className="btn btn-secondary btn-sm"
-            style={{ flex: 1, textTransform: 'none', fontWeight: 'var(--weight-semibold)' }}
-          >
-            ⬢ Test Admin Panel
           </button>
         </div>
       </div>
