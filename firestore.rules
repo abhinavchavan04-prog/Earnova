@@ -1,0 +1,161 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ============================================================
+    // HELPER FUNCTIONS
+    // ============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.role == 'admin';
+    }
+
+    function isOps() {
+      return isAuthenticated() && request.auth.token.role == 'ops';
+    }
+
+    function isAdminOrOps() {
+      return isAdmin() || isOps();
+    }
+
+    function isActiveSubscriber() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.subscription.status == 'active';
+    }
+
+    // ============================================================
+    // USERS
+    // ============================================================
+    
+    match /users/{userId} {
+      // Users can read their own profile
+      allow read: if isOwner(userId);
+      // Users can update their own profile (but not role or wallet)
+      allow update: if isOwner(userId) && 
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'wallet']);
+      // Only admins can read all users or modify sensitive fields
+      allow read, write: if isAdmin();
+    }
+
+    // ============================================================
+    // SUBSCRIPTION EVENTS (admin-only writes, server-side via Admin SDK)
+    // ============================================================
+    
+    match /subscriptionEvents/{eventId} {
+      allow read: if isAdmin();
+      // Writes happen server-side via Admin SDK (webhook handler)
+    }
+
+    // ============================================================
+    // BUCKET 1 — TASKS
+    // ============================================================
+    
+    match /taskCategories/{categoryId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /taskOffers/{offerId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /taskCompletions/{completionId} {
+      // Users can read their own completions
+      allow read: if isOwner(resource.data.userId);
+      // Users can create completions for themselves
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      // Admin/ops can read all and update status
+      allow read, write: if isAdminOrOps();
+    }
+
+    // ============================================================
+    // BUCKET 1 — AD NETWORK PARTNERS
+    // ============================================================
+    
+    match /adNetworkPartners/{partnerId} {
+      allow read, write: if isAdmin();
+    }
+
+    // ============================================================
+    // BUCKET 2 — CLIENTS & JOBS
+    // ============================================================
+    
+    match /clients/{clientId} {
+      allow read, write: if isAdmin();
+      allow read: if isOps();
+    }
+
+    match /jobs/{jobId} {
+      // Authenticated users can read open jobs
+      allow read: if isAuthenticated();
+      // Only admin can create/update jobs
+      allow write: if isAdmin();
+    }
+
+    match /jobAssignments/{assignmentId} {
+      // Users can read their own assignments
+      allow read: if isOwner(resource.data.userId);
+      // Users can create assignments (claiming a job)
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      // Admin/ops can read all and update
+      allow read, write: if isAdminOrOps();
+    }
+
+    match /deliverables/{deliverableId} {
+      // Users can read their own deliverables
+      allow read: if isOwner(resource.data.userId);
+      // Users can create deliverables (submitting work)
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      // Admin/ops can read all and update review status
+      allow read, write: if isAdminOrOps();
+    }
+
+    // ============================================================
+    // LEARN & EARN
+    // ============================================================
+    
+    match /contentItems/{contentId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // WALLET & PAYOUTS
+    // ============================================================
+    
+    match /transactions/{txId} {
+      // Users can read their own transactions
+      allow read: if isOwner(resource.data.userId);
+      // Admin can read all
+      allow read: if isAdmin();
+      // Writes happen server-side via Admin SDK
+    }
+
+    match /payoutRequests/{payoutId} {
+      // Users can read their own payout requests
+      allow read: if isOwner(resource.data.userId);
+      // Users can create payout requests
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      // Admin can read all and update status
+      allow read, write: if isAdmin();
+    }
+
+    // ============================================================
+    // ADMIN — AUDIT LOG
+    // ============================================================
+    
+    match /auditLog/{logId} {
+      allow read: if isAdmin();
+      // Writes happen server-side via Admin SDK
+    }
+  }
+}
