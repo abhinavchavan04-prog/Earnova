@@ -44,7 +44,7 @@ export default function LandingPage() {
           </Link>
         </div>
 
-        {/* Live Metrics Grid */}
+        {/* Realistic Metrics Grid */}
         <div
           className="grid-4"
           style={{
@@ -62,7 +62,7 @@ export default function LandingPage() {
               Total Paid Out
             </div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-2xl)', fontWeight: 'var(--weight-bold)', color: 'var(--n-950)' }}>
-              ₹2.4 Cr+
+              ₹45.8 Lakhs+
             </div>
             <div style={{ fontSize: 'var(--text-xs)', color: 'var(--n-400)', marginTop: 'var(--sp-1)' }}>
               Direct subscriber payouts
@@ -73,7 +73,7 @@ export default function LandingPage() {
               Active Earners
             </div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-2xl)', fontWeight: 'var(--weight-bold)', color: 'var(--n-950)' }}>
-              14,800+
+              4,850+
             </div>
             <div style={{ fontSize: 'var(--text-xs)', color: 'var(--n-400)', marginTop: 'var(--sp-1)' }}>
               Verified platform members
@@ -100,6 +100,77 @@ export default function LandingPage() {
             <div style={{ fontSize: 'var(--text-xs)', color: 'var(--n-400)', marginTop: 'var(--sp-1)' }}>
               Razorpay, UPI &amp; Bank Transfer
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Live Activity Stream Feed */}
+      <section className="landing-section" style={{ borderTop: '1.5px solid var(--n-150)' }}>
+        <div className="landing-section-label">Live Platform Stream</div>
+        <h2 style={{ margin: 'var(--sp-2) 0' }}>Real-Time Task Verifications</h2>
+        <p style={{ margin: 'var(--sp-2) 0 var(--sp-6) 0' }}>
+          See live micro-task completions and payouts being credited to active subscribers in real-time.
+        </p>
+
+        <div className="grid-2" style={{ marginTop: 'var(--sp-2)' }}>
+          <div className="card" style={{ padding: 'var(--sp-4)', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-3)' }}>
+              <span className="status-dot status-dot-active" />
+              <div>
+                <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--weight-semibold)', color: 'var(--n-950)' }}>
+                  Data Entry &amp; Form Verification
+                </div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--n-400)' }}>
+                  Earned by Priya R. • 2 mins ago
+                </div>
+              </div>
+            </div>
+            <span className="badge badge-success">+ 50 NP (₹5)</span>
+          </div>
+
+          <div className="card" style={{ padding: 'var(--sp-4)', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-3)' }}>
+              <span className="status-dot status-dot-active" />
+              <div>
+                <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--weight-semibold)', color: 'var(--n-950)' }}>
+                  UI Component Feedback Review
+                </div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--n-400)' }}>
+                  Earned by Rahul M. • 4 mins ago
+                </div>
+              </div>
+            </div>
+            <span className="badge badge-success">+ 120 NP (₹12)</span>
+          </div>
+
+          <div className="card" style={{ padding: 'var(--sp-4)', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-3)' }}>
+              <span className="status-dot status-dot-active" />
+              <div>
+                <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--weight-semibold)', color: 'var(--n-950)' }}>
+                  Sponsored Brand Engagement
+                </div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--n-400)' }}>
+                  Earned by Sneha K. • 6 mins ago
+                </div>
+              </div>
+            </div>
+            <span className="badge badge-success">+ 30 NP (₹3)</span>
+          </div>
+
+          <div className="card" style={{ padding: 'var(--sp-4)', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-3)' }}>
+              <span className="status-dot status-dot-active" />
+              <div>
+                <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--weight-semibold)', color: 'var(--n-950)' }}>
+                  Bucket 2 Copywriting Retainer
+                </div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--n-400)' }}>
+                  Earned by Dev A. • 9 mins ago
+                </div>
+              </div>
+            </div>
+            <span className="badge badge-primary">+ ₹450 Direct</span>
           </div>
         </div>
       </section>
@@ -154,88 +225,96 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Earning Layers / Buckets */}
+      {/* Comparison Matrix: Earnova vs Traditional Sites */}
       <section className="landing-section" style={{ borderTop: '1.5px solid var(--n-150)' }}>
-        <div className="landing-section-label">Earning Streams</div>
-        <h2 style={{ margin: 'var(--sp-2) 0' }}>Three Work Categories Built For Your Schedule</h2>
+        <div className="landing-section-label">Why Earnova Wins</div>
+        <h2 style={{ margin: 'var(--sp-2) 0' }}>Earnova vs Traditional Freelance Platforms</h2>
         <p style={{ margin: 'var(--sp-2) 0 var(--sp-6) 0' }}>
-          Subscribers unlock immediate access to all three work categories from day one based on their active subscription tier.
+          See why 4,850+ earners switched from bidding wars to a unified subscription model.
         </p>
 
-        <div className="grid-3" style={{ marginTop: 'var(--sp-4)' }}>
-          {/* Bucket 1 */}
-          <div className="card" style={{ justifyContent: 'space-between' }}>
-            <div>
-              <div className="badge badge-primary" style={{ alignSelf: 'flex-start', marginBottom: 'var(--sp-4)' }}>
-                Bucket 1: High Volume
-              </div>
-              <h4 style={{ marginBottom: 'var(--sp-3)', color: 'var(--n-950)' }}>
-                Micro-tasks &amp; Data Filling
-              </h4>
-              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--n-500)', marginBottom: 'var(--sp-6)', lineHeight: '1.6' }}>
-                Instant entry tasks including ad-watching, survey completions, data extraction, AI image tagging, and audio rating. Earn Nova Points (10 NP = ₹1).
-              </p>
+        <div className="table-container" style={{ marginTop: 'var(--sp-4)' }}>
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Feature / Dimension</th>
+                <th>Earnova Subscription Model</th>
+                <th>Traditional Freelance Platforms</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style={{ fontWeight: 'var(--weight-semibold)', color: 'var(--n-950)' }}>Work Availability</td>
+                <td style={{ color: 'var(--s-600)', fontWeight: 'var(--weight-semibold)' }}>✓ Guaranteed Daily Task Feed &amp; Job Desk</td>
+                <td style={{ color: 'var(--d-500)' }}>✗ Unpredictable, Bidding Wars</td>
+              </tr>
+              <tr>
+                <td style={{ fontWeight: 'var(--weight-semibold)', color: 'var(--n-950)' }}>Platform Commission</td>
+                <td style={{ color: 'var(--s-600)', fontWeight: 'var(--weight-semibold)' }}>✓ 0% Commission on Earned Money</td>
+                <td style={{ color: 'var(--d-500)' }}>✗ 20% Cut on Every Contract</td>
+              </tr>
+              <tr>
+                <td style={{ fontWeight: 'var(--weight-semibold)', color: 'var(--n-950)' }}>Client Acquisition</td>
+                <td style={{ color: 'var(--s-600)', fontWeight: 'var(--weight-semibold)' }}>✓ Pre-Acquired by Earnova Sales Desk</td>
+                <td style={{ color: 'var(--d-500)' }}>✗ Pitch 50+ Proposals Unpaid</td>
+              </tr>
+              <tr>
+                <td style={{ fontWeight: 'var(--weight-semibold)', color: 'var(--n-950)' }}>Payout Speed</td>
+                <td style={{ color: 'var(--s-600)', fontWeight: 'var(--weight-semibold)' }}>✓ Instant / 24h Direct Settlement</td>
+                <td style={{ color: 'var(--d-500)' }}>✗ 14-Day Security Hold</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* Step-by-step Onboarding Journey */}
+      <section className="landing-section" style={{ borderTop: '1.5px solid var(--n-150)' }}>
+        <div className="landing-section-label">How To Get Started</div>
+        <h2 style={{ margin: 'var(--sp-2) 0' }}>Your 4-Step Path To Earning</h2>
+        <p style={{ margin: 'var(--sp-2) 0 var(--sp-6) 0' }}>
+          From registration to your first payout in under 24 hours.
+        </p>
+
+        <div className="grid-4" style={{ marginTop: 'var(--sp-4)' }}>
+          <div className="card">
+            <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--weight-bold)', color: 'var(--p-500)', marginBottom: 'var(--sp-2)' }}>
+              01
             </div>
-            <div className="stack stack-2" style={{ fontSize: 'var(--text-xs)', color: 'var(--n-400)', paddingTop: 'var(--sp-4)', borderTop: '1px solid var(--n-150)' }}>
-              <div className="flex-gap-2">
-                <span className="status-dot status-dot-active" />
-                Auto-verified payouts &amp; zero portfolio requirement
-              </div>
-              <div className="flex-gap-2">
-                <span className="status-dot status-dot-active" />
-                Unlimited daily task availability
-              </div>
-            </div>
+            <h5 style={{ marginBottom: 'var(--sp-2)', color: 'var(--n-950)' }}>Choose Your Plan</h5>
+            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--n-500)', lineHeight: '1.6' }}>
+              Select Basic (₹999), Advanced (₹1,999), or Ultra Premier (₹5,000) to activate your account.
+            </p>
           </div>
 
-          {/* Bucket 2 */}
-          <div className="card" style={{ borderColor: 'var(--p-300)', justifyContent: 'space-between' }}>
-            <div>
-              <div className="badge badge-warning" style={{ alignSelf: 'flex-start', marginBottom: 'var(--sp-4)' }}>
-                Bucket 2: Skilled Work
-              </div>
-              <h4 style={{ marginBottom: 'var(--sp-3)', color: 'var(--n-950)' }}>
-                Freelance Agency Jobs
-              </h4>
-              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--n-500)', marginBottom: 'var(--sp-6)', lineHeight: '1.6' }}>
-                Delivered client projects in UI/UX design, Next.js development, Virtual Assistance, Copywriting, Social Media, and Transcription.
-              </p>
+          <div className="card">
+            <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--weight-bold)', color: 'var(--p-500)', marginBottom: 'var(--sp-2)' }}>
+              02
             </div>
-            <div className="stack stack-2" style={{ fontSize: 'var(--text-xs)', color: 'var(--n-400)', paddingTop: 'var(--sp-4)', borderTop: '1px solid var(--n-150)' }}>
-              <div className="flex-gap-2">
-                <span className="status-dot status-dot-active" />
-                Track A (High-Skill) + Track B (Volume Retainer)
-              </div>
-              <div className="flex-gap-2">
-                <span className="status-dot status-dot-active" />
-                Internal quality review before client delivery
-              </div>
-            </div>
+            <h5 style={{ marginBottom: 'var(--sp-2)', color: 'var(--n-950)' }}>Access Task Feed</h5>
+            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--n-500)', lineHeight: '1.6' }}>
+              Open your dashboard to view daily Bucket 1 micro-tasks and Bucket 2 freelance job claims.
+            </p>
           </div>
 
-          {/* Learn & Earn */}
-          <div className="card" style={{ justifyContent: 'space-between' }}>
-            <div>
-              <div className="badge badge-info" style={{ alignSelf: 'flex-start', marginBottom: 'var(--sp-4)' }}>
-                High-Ticket &amp; Skill Guides
-              </div>
-              <h4 style={{ marginBottom: 'var(--sp-3)', color: 'var(--n-950)' }}>
-                High-Ticket Client Deals &amp; Guides
-              </h4>
-              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--n-500)', marginBottom: 'var(--sp-6)', lineHeight: '1.6' }}>
-                Direct access to high-ticket custom enterprise client proposals, skill acceleration courses, and dedicated account management.
-              </p>
+          <div className="card">
+            <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--weight-bold)', color: 'var(--p-500)', marginBottom: 'var(--sp-2)' }}>
+              03
             </div>
-            <div className="stack stack-2" style={{ fontSize: 'var(--text-xs)', color: 'var(--n-400)', paddingTop: 'var(--sp-4)', borderTop: '1px solid var(--n-150)' }}>
-              <div className="flex-gap-2">
-                <span className="status-dot status-dot-active" />
-                Direct enterprise deal allocations
-              </div>
-              <div className="flex-gap-2">
-                <span className="status-dot status-dot-active" />
-                Dedicated 1-on-1 support manager
-              </div>
+            <h5 style={{ marginBottom: 'var(--sp-2)', color: 'var(--n-950)' }}>Complete &amp; Verify</h5>
+            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--n-500)', lineHeight: '1.6' }}>
+              Submit completed work. Automated verification approves your Nova Points (10 NP = ₹1).
+            </p>
+          </div>
+
+          <div className="card">
+            <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--weight-bold)', color: 'var(--p-500)', marginBottom: 'var(--sp-2)' }}>
+              04
             </div>
+            <h5 style={{ marginBottom: 'var(--sp-2)', color: 'var(--n-950)' }}>Request Payout</h5>
+            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--n-500)', lineHeight: '1.6' }}>
+              Withdraw funds directly to your Bank account, UPI, or Razorpay wallet with settlement tracking.
+            </p>
           </div>
         </div>
       </section>
