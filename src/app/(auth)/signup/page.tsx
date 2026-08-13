@@ -12,6 +12,7 @@ export default function SignupPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
   // Redirect if already logged in
@@ -24,7 +25,7 @@ export default function SignupPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await signUp(email, password, name);
+      await signUp(email, password, name, rememberMe);
       router.push(email.toLowerCase() === 'abhinavchavan04@gmail.com' ? '/admin' : '/dashboard');
     } catch {
       // Error handled by AuthProvider
@@ -35,7 +36,7 @@ export default function SignupPage() {
 
   const handleGoogle = async () => {
     try {
-      await signInWithGoogle();
+      await signInWithGoogle(rememberMe);
       router.push('/dashboard');
     } catch {
       // Error handled by AuthProvider
@@ -122,6 +123,20 @@ export default function SignupPage() {
             minLength={6}
           />
           <span className="input-help">Minimum 6 characters</span>
+        </div>
+
+        {/* Remember Me checkbox */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', margin: 'var(--sp-1) 0 var(--sp-3) 0' }}>
+          <input
+            type="checkbox"
+            id="rememberMe"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+            style={{ width: '16px', height: '16px', accentColor: 'var(--p-600)', cursor: 'pointer' }}
+          />
+          <label htmlFor="rememberMe" style={{ fontSize: 'var(--text-xs)', color: 'var(--n-600)', cursor: 'pointer', userSelect: 'none' }}>
+            Remember me (Keep me signed in directly on next visit)
+          </label>
         </div>
 
         <button

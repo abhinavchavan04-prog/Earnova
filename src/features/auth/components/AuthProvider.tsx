@@ -10,6 +10,9 @@ import {
   GoogleAuthProvider,
   signOut,
   updateProfile,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase-client';
@@ -21,9 +24,9 @@ interface AuthContextType {
   profile: UserProfile | null;
   loading: boolean;
   error: string | null;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, name: string) => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
+  signIn: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
+  signUp: (email: string, password: string, name: string, rememberMe?: boolean) => Promise<void>;
+  signInWithGoogle: (rememberMe?: boolean) => Promise<void>;
   demoSignIn: (role?: 'subscriber' | 'admin') => void;
   logout: () => Promise<void>;
   clearError: () => void;
@@ -32,7 +35,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-// Default Admin Email specified by platform owner
 export const ADMIN_EMAIL = 'abhinavchavan04@gmail.com';
 
 const DEMO_SUBSCRIBER_PROFILE: UserProfile = {
@@ -42,14 +44,14 @@ const DEMO_SUBSCRIBER_PROFILE: UserProfile = {
   role: ROLES.SUBSCRIBER,
   subscription: {
     status: SUB_STATUS.ACTIVE,
-    tier: TIERS.BASIC, // Basic ₹999 plan — can do tasks, but withdrawal gated by Ultra (₹5,000)
+    tier: TIERS.BASIC,
     planId: 'plan_basic_999',
     razorpaySubId: 'sub_basic_123',
     startDate: new Date().toISOString(),
     renewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
   },
   wallet: {
-    balance: 1750000, // ₹17,500 = 1,750 NP calculated earnings
+    balance: 1750000,
     totalEarned: 2750000,
   },
   profile: {
@@ -106,7 +108,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (docSnap.exists()) {
         const data = docSnap.data() as UserProfile;
-        // Ensure admin user always gets ADMIN role
         if (isAdminUser && data.role !== ROLES.ADMIN) {
           data.role = ROLES.ADMIN;
         }
@@ -126,7 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             renewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
           },
           wallet: {
-            balance: 10000, // ₹100 welcome bonus = 10 NP
+            balance: 10000,
             totalEarned: 10000,
           },
           profile: {
@@ -152,8 +153,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    // Check if user session is stored in localStorage
-    const savedUserJson = typeof window !== 'undefined' ? localStorage.getItem('earnova_mock_user') : null;
+    // Check if session exists in localStorage (Remember Me) or sessionStorage
+    const localUserJson = typeof window !== 'undefined' ? localStorage.getItem('earnova_mock_user') : null;
+    const sessionUserJson = typeof window !== 'undefined' ? sessionStorage.getItem('earnova_mock_user') : null;
+
+    const savedUserJson = localUserJson || sessionUserJson;
 
     if (savedUserJson) {
       try {
@@ -163,7 +167,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoading(false);
         return;
       } catch {
-        localStorage.removeItem('earnova_mock_user');
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('earnova_mock_user');
+          sessionStorage.removeItem('earnova_mock_user');
+        }
       }
     }
 
@@ -185,7 +192,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe();
   }, [fetchProfile, isFirebaseConfigured]);
 
-  const signIn = async (email: string, password: string) => {
+  const saveMockSession = (mockUser: User, mockProfile: UserProfile, rememberMe: boolean) => {
+    if (typeof window !== 'undefined') {
+      const dataStr = JSON.stringify({ user: mockUser, profile: mockProfile });
+      if (rememberMe) {
+        localStorage.setItem('earnova_mock_user', dataStr);
+        sessionStorage.removeItem('earnova_mock_user');
+      } else {
+        sessionStorage.setItem('earnova_mock_user', dataStr);
+        localStorage.removeItem('earnova_mock_user');
+      }
+    }
+  };
+
+  const signIn = async (email: string, password: string, rememberMe = true) => {
     setError(null);
     const isAdminEmail = email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
 
@@ -200,15 +220,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           };
 
       const mockUser = { uid: mockProfile.uid, email, displayName: mockProfile.displayName } as User;
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('earnova_mock_user', JSON.stringify({ user: mockUser, profile: mockProfile }));
-      }
+      saveMockSession(mockUser, mockProfile, rememberMe);
       setUser(mockUser);
       setProfile(mockProfile);
       return;
     }
 
     try {
+      await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
       await signInWithEmailAndPassword(auth, email, password);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Sign in failed';
@@ -217,7 +236,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string, name: string) => {
+  const signUp = async (email: string, password: string, name: string, rememberMe = true) => {
     setError(null);
     const isAdminEmail = email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
 
@@ -236,7 +255,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           renewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         },
         wallet: {
-          balance: 10000, // ₹100 bonus = 10 NP
+          balance: 10000,
           totalEarned: 10000,
         },
         profile: {
@@ -249,15 +268,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
 
       const mockUser = { uid: newMockProfile.uid, email, displayName: name } as User;
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('earnova_mock_user', JSON.stringify({ user: mockUser, profile: newMockProfile }));
-      }
+      saveMockSession(mockUser, newMockProfile, rememberMe);
       setUser(mockUser);
       setProfile(newMockProfile);
       return;
     }
 
     try {
+      await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
       const credential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(credential.user, { displayName: name });
     } catch (err: unknown) {
@@ -267,7 +285,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = async (rememberMe = true) => {
     setError(null);
     if (!isFirebaseConfigured) {
       const googleUser = {
@@ -281,15 +299,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email: googleUser.email || '',
         displayName: googleUser.displayName || 'Subscriber User',
       };
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('earnova_mock_user', JSON.stringify({ user: googleUser, profile: googleProfile }));
-      }
+      saveMockSession(googleUser, googleProfile, rememberMe);
       setUser(googleUser);
       setProfile(googleProfile);
       return;
     }
 
     try {
+      await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
     } catch (err: unknown) {
@@ -302,19 +319,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const demoSignIn = (role: 'subscriber' | 'admin' = 'subscriber') => {
     setError(null);
     const demoProfile = role === 'admin' ? DEMO_ADMIN_PROFILE : DEMO_SUBSCRIBER_PROFILE;
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('earnova_mock_user', JSON.stringify({
-        user: { uid: demoProfile.uid, email: demoProfile.email, displayName: demoProfile.displayName },
-        profile: demoProfile
-      }));
-    }
-    setUser({ uid: demoProfile.uid, email: demoProfile.email, displayName: demoProfile.displayName } as User);
+    const mockUser = { uid: demoProfile.uid, email: demoProfile.email, displayName: demoProfile.displayName } as User;
+    saveMockSession(mockUser, demoProfile, true);
+    setUser(mockUser);
     setProfile(demoProfile);
   };
 
   const logout = async () => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('earnova_mock_user');
+      sessionStorage.removeItem('earnova_mock_user');
     }
     if (isFirebaseConfigured) {
       try {
