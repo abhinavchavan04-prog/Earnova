@@ -7,19 +7,13 @@ import { useAuth } from '@/features/auth';
 import { APP_NAME } from '@/lib/constants';
 
 export default function SignupPage() {
-  const { signUp, signInWithGoogle, demoSignIn, error, clearError, loading, user } = useAuth();
+  const { signUp, signInWithGoogle, demoSignIn, logout, error, clearError, user } = useAuth();
   const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-
-  // Redirect if already logged in
-  if (user && !loading) {
-    router.push(user.email?.toLowerCase() === 'abhinavchavan04@gmail.com' ? '/admin' : '/dashboard');
-    return null;
-  }
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -51,7 +45,42 @@ export default function SignupPage() {
         Sign up to start earning Nova Points across micro-tasks and freelance jobs.
       </p>
 
-      {/* Attractive & Visible Instant Demo Preview Section */}
+      {/* If already signed in banner */}
+      {user && (
+        <div
+          className="card"
+          style={{
+            background: 'var(--p-50)',
+            borderColor: 'var(--p-300)',
+            marginBottom: 'var(--sp-5)',
+            padding: 'var(--sp-4)',
+          }}
+        >
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--n-700)', marginBottom: 'var(--sp-2)' }}>
+            ℹ️ Currently signed in as <strong>{user.email || user.displayName || 'Active User'}</strong>
+          </div>
+          <div className="flex-gap-2">
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={() => router.push(user.email?.toLowerCase() === 'abhinavchavan04@gmail.com' ? '/admin' : '/dashboard')}
+              style={{ flex: 1 }}
+            >
+              Continue to Dashboard →
+            </button>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={logout}
+              style={{ flex: 1, color: 'var(--d-500)' }}
+            >
+              Sign Out &amp; Switch Account
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Instant Demo Preview Section */}
       <div
         className="card"
         style={{
