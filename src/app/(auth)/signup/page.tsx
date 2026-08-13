@@ -7,7 +7,7 @@ import { useAuth } from '@/features/auth';
 import { APP_NAME } from '@/lib/constants';
 
 export default function SignupPage() {
-  const { signUp, signInWithGoogle, error, clearError, loading, user } = useAuth();
+  const { signUp, signInWithGoogle, demoSignIn, error, clearError, loading, user } = useAuth();
   const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -42,6 +42,16 @@ export default function SignupPage() {
     }
   };
 
+  const handleDemoSubscriber = () => {
+    demoSignIn('subscriber');
+    router.push('/dashboard');
+  };
+
+  const handleDemoAdmin = () => {
+    demoSignIn('admin');
+    router.push('/admin');
+  };
+
   return (
     <div className="auth-card">
       <div className="auth-brand">{APP_NAME}</div>
@@ -49,6 +59,24 @@ export default function SignupPage() {
       <p className="auth-subtext">
         Sign up to access earning opportunities across micro-tasks, freelance work, and skill guides.
       </p>
+
+      {/* Demo Sign In Quick Access */}
+      <div className="card" style={{ background: 'var(--p-50)', borderColor: 'var(--p-300)', marginBottom: 'var(--sp-5)', padding: 'var(--sp-4)' }}>
+        <div style={{ fontSize: 'var(--text-xs)', fontWeight: 'var(--weight-semibold)', color: 'var(--p-600)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--sp-2)' }}>
+          ⚡ Quick Demo Mode
+        </div>
+        <p style={{ fontSize: 'var(--text-xs)', color: 'var(--n-600)', marginBottom: 'var(--sp-3)' }}>
+          Test the entire platform instantly without configuring Firebase Auth.
+        </p>
+        <div className="flex-gap-2">
+          <button type="button" className="btn btn-primary btn-sm" onClick={handleDemoSubscriber} style={{ flex: 1 }}>
+            Demo Subscriber
+          </button>
+          <button type="button" className="btn btn-secondary btn-sm" onClick={handleDemoAdmin} style={{ flex: 1 }}>
+            Demo Admin Panel
+          </button>
+        </div>
+      </div>
 
       {error && (
         <div
