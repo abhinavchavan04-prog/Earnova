@@ -26,11 +26,6 @@ service cloud.firestore {
       return isAdmin() || isOps();
     }
 
-    function isActiveSubscriber() {
-      return isAuthenticated() && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.subscription.status == 'active';
-    }
-
     // ============================================================
     // USERS
     // ============================================================
