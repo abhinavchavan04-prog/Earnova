@@ -10,8 +10,68 @@ export default function LandingPage() {
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
+  const jsonLdWebSite = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Earnova',
+    url: 'https://earnova.vercel.app',
+    description: 'Direct access to verified micro-tasks, freelance jobs, and instant UPI payouts.',
+  };
+
+  const jsonLdOrg = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Earnova Technologies',
+    url: 'https://earnova.vercel.app',
+    logo: 'https://earnova.vercel.app/logo.png',
+    sameAs: ['https://twitter.com/earnova_app'],
+  };
+
+  const jsonLdOffers = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: 'Earnova Platform Membership Tiers',
+    description: 'Access verified daily micro-tasks and freelance job streams with zero commission fees.',
+    offers: [
+      {
+        '@type': 'Offer',
+        name: 'Basic Plan',
+        price: '999.00',
+        priceCurrency: 'INR',
+        availability: 'https://schema.org/InStock',
+      },
+      {
+        '@type': 'Offer',
+        name: 'Advanced Plan',
+        price: '1999.00',
+        priceCurrency: 'INR',
+        availability: 'https://schema.org/InStock',
+      },
+      {
+        '@type': 'Offer',
+        name: 'Ultra Plan',
+        price: '5000.00',
+        priceCurrency: 'INR',
+        availability: 'https://schema.org/InStock',
+      },
+    ],
+  };
+
   return (
     <div style={{ background: 'var(--n-0)', minHeight: '100vh', color: 'var(--n-600)' }}>
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebSite) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrg) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOffers) }}
+      />
       {/* Navigation */}
       <nav className="landing-nav">
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-3)' }}>
@@ -111,8 +171,10 @@ export default function LandingPage() {
         }
       `}</style>
 
-      {/* Hero Section */}
-      <section className="landing-hero">
+      {/* Main Semantic Content */}
+      <main>
+        {/* Hero Section */}
+        <section className="landing-hero">
         <div className="landing-hero-tag">
           ✦ OFFICIAL DIRECT JOB &amp; MICRO-TASK PROVIDER
         </div>
@@ -518,6 +580,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      </main>
 
       {/* Footer */}
       <footer
@@ -548,10 +611,12 @@ export default function LandingPage() {
           </div>
 
           <div className="flex-gap-6" style={{ flexWrap: 'wrap', fontSize: 'var(--text-xs)' }}>
+            <Link href="/privacy" style={{ color: 'var(--n-600)' }}>Privacy Policy</Link>
+            <Link href="/terms" style={{ color: 'var(--n-600)' }}>Terms &amp; Conditions</Link>
+            <Link href="/refund" style={{ color: 'var(--n-600)' }}>Refund &amp; Cancellation</Link>
+            <Link href="/contact" style={{ color: 'var(--n-600)' }}>Contact Us</Link>
             <Link href="/login" style={{ color: 'var(--n-600)' }}>Log in</Link>
             <Link href="/signup" style={{ color: 'var(--n-600)' }}>Sign up</Link>
-            <Link href="#pricing" style={{ color: 'var(--n-600)' }}>Pricing Tiers</Link>
-            <Link href="#business-model" style={{ color: 'var(--n-600)' }}>Business Model</Link>
           </div>
         </div>
 
