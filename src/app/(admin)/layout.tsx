@@ -41,17 +41,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const { profile, logout } = useAuth();
 
+  const handleBack = () => {
+    if (typeof window !== 'undefined' && window.history.length > 1 && document.referrer.includes(window.location.host)) {
+      router.back();
+    } else {
+      router.push('/');
+    }
+  };
+
   return (
     <AdminGuard>
       <div className="app-layout">
         {/* Admin Sidebar */}
         <aside className="sidebar" style={{ background: 'var(--n-0)' }}>
           <div className="sidebar-header flex-between">
-            <Link href="/admin" className="sidebar-logo">
+            <Link href="/" className="sidebar-logo" title="Return to Landing Page">
               {APP_NAME}
               <span className="badge badge-warning" style={{ marginLeft: 'var(--sp-2)' }}>Admin</span>
             </Link>
-            <Link href="/" className="btn btn-ghost btn-sm" style={{ fontSize: 'var(--text-xs)', color: 'var(--n-500)' }} title="Return to Landing Page">
+            <Link href="/" className="btn btn-ghost btn-sm" style={{ fontSize: 'var(--text-xs)', color: 'var(--p-600)' }} title="Return to Home Page">
               🏠 Home
             </Link>
           </div>
@@ -92,8 +100,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   {profile?.role === 'admin' ? 'Super Admin' : 'Ops/Reviewer'}
                 </div>
               </div>
-              <button className="btn btn-ghost btn-sm" onClick={logout} title="Sign out">
-                ↗
+              <button className="btn btn-ghost btn-sm" onClick={logout} title="Leave & Return to Home Page">
+                🏠 Leave
               </button>
             </div>
           </div>
@@ -101,7 +109,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Main Content Area */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-          {/* Top Admin Navbar with Back button */}
+          {/* Top Admin Navbar */}
           <header style={{
             display: 'flex',
             alignItems: 'center',
@@ -117,14 +125,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <button
                 type="button"
                 className="btn btn-ghost btn-sm"
-                onClick={() => router.back()}
+                onClick={handleBack}
                 style={{ fontSize: 'var(--text-xs)', fontWeight: 'var(--weight-medium)', display: 'flex', alignItems: 'center', gap: 'var(--sp-1)' }}
               >
                 ← Back
               </button>
               <span style={{ color: 'var(--n-300)' }}>|</span>
-              <Link href="/admin" className="btn btn-ghost btn-sm" style={{ fontSize: 'var(--text-xs)' }}>
-                Admin Home
+              <Link href="/" className="btn btn-ghost btn-sm" style={{ fontSize: 'var(--text-xs)', color: 'var(--p-600)' }}>
+                🏠 Home Page
               </Link>
             </div>
 
@@ -133,7 +141,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 👤 Switch to Subscriber View
               </Link>
               <button onClick={logout} className="btn btn-ghost btn-sm" style={{ fontSize: 'var(--text-xs)', color: 'var(--d-500)' }}>
-                Sign Out
+                🏠 Leave &amp; Sign Out
               </button>
             </div>
           </header>

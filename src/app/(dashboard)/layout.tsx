@@ -20,16 +20,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter();
   const { profile, logout } = useAuth();
 
+  const handleBack = () => {
+    if (typeof window !== 'undefined' && window.history.length > 1 && document.referrer.includes(window.location.host)) {
+      router.back();
+    } else {
+      router.push('/');
+    }
+  };
+
   return (
     <AuthGuard>
       <div className="app-layout">
         {/* Sidebar */}
         <aside className="sidebar">
           <div className="sidebar-header flex-between">
-            <Link href="/dashboard" className="sidebar-logo">
+            <Link href="/" className="sidebar-logo" title="Return to Landing Page">
               {APP_NAME}
             </Link>
-            <Link href="/" className="btn btn-ghost btn-sm" style={{ fontSize: 'var(--text-xs)', color: 'var(--n-500)' }} title="Return to Landing Page">
+            <Link href="/" className="btn btn-ghost btn-sm" style={{ fontSize: 'var(--text-xs)', color: 'var(--p-600)' }} title="Return to Home Page">
               🏠 Home
             </Link>
           </div>
@@ -104,9 +112,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <button
                 className="btn btn-ghost btn-sm"
                 onClick={logout}
-                title="Sign out"
+                title="Leave & Return to Home Page"
               >
-                ↗
+                🏠 Leave
               </button>
             </div>
           </div>
@@ -114,7 +122,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Main Content Area */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-          {/* Top Universal Navbar with Back Button */}
+          {/* Top Universal Navbar */}
           <header style={{
             display: 'flex',
             alignItems: 'center',
@@ -130,14 +138,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <button
                 type="button"
                 className="btn btn-ghost btn-sm"
-                onClick={() => router.back()}
+                onClick={handleBack}
                 style={{ fontSize: 'var(--text-xs)', fontWeight: 'var(--weight-medium)', display: 'flex', alignItems: 'center', gap: 'var(--sp-1)' }}
               >
                 ← Back
               </button>
               <span style={{ color: 'var(--n-300)' }}>|</span>
-              <Link href="/dashboard" className="btn btn-ghost btn-sm" style={{ fontSize: 'var(--text-xs)' }}>
-                Dashboard Home
+              <Link href="/" className="btn btn-ghost btn-sm" style={{ fontSize: 'var(--text-xs)', color: 'var(--p-600)' }}>
+                🏠 Home Page
               </Link>
             </div>
 
@@ -151,7 +159,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </Link>
               )}
               <button onClick={logout} className="btn btn-ghost btn-sm" style={{ fontSize: 'var(--text-xs)', color: 'var(--d-500)' }}>
-                Sign Out
+                🏠 Leave &amp; Sign Out
               </button>
             </div>
           </header>

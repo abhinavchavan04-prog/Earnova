@@ -328,12 +328,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Demo Sign-In: Always transient (rememberMe = false) so it NEVER saves to localStorage!
   const demoSignIn = (role: 'subscriber' | 'admin' = 'subscriber') => {
     setError(null);
     const demoProfile = role === 'admin' ? DEMO_ADMIN_PROFILE : DEMO_SUBSCRIBER_PROFILE;
     const mockUser = { uid: demoProfile.uid, email: demoProfile.email, displayName: demoProfile.displayName } as User;
-    saveMockSession(mockUser, demoProfile, false); // Store only in sessionStorage, not localStorage
+    saveMockSession(mockUser, demoProfile, false);
     setUser(mockUser);
     setProfile(demoProfile);
   };
@@ -352,6 +351,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     setUser(null);
     setProfile(null);
+    if (typeof window !== 'undefined') {
+      window.location.href = '/'; // Always redirect cleanly to Landing Home Page on Logout/Leave!
+    }
   };
 
   const clearError = () => setError(null);
