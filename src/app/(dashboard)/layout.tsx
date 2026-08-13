@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { AuthGuard, useAuth } from '@/features/auth';
 import { APP_NAME, SUB_STATUS } from '@/lib/constants';
 import { formatCurrency, paiseToPoints, getInitials } from '@/utils/format';
@@ -17,6 +17,7 @@ const NAV_ITEMS = [
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { profile, logout } = useAuth();
 
   return (
@@ -24,9 +25,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="app-layout">
         {/* Sidebar */}
         <aside className="sidebar">
-          <div className="sidebar-header">
+          <div className="sidebar-header flex-between">
             <Link href="/dashboard" className="sidebar-logo">
               {APP_NAME}
+            </Link>
+            <Link href="/" className="btn btn-ghost btn-sm" style={{ fontSize: 'var(--text-xs)', color: 'var(--n-500)' }} title="Return to Landing Page">
+              🏠 Home
             </Link>
           </div>
 
@@ -37,7 +41,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 key={item.href}
                 href={item.href}
                 className={`sidebar-link ${
-                  pathname === item.href || pathname.startsWith(item.href + '/')
+                  pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
                     ? 'sidebar-link-active'
                     : ''
                 }`}
@@ -108,10 +112,54 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </aside>
 
-        {/* Main Content */}
-        <main className="main-content">
-          {children}
-        </main>
+        {/* Main Content Area */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+          {/* Top Universal Navbar with Back Button */}
+          <header style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: 'var(--sp-3) var(--sp-6)',
+            background: 'var(--n-0)',
+            borderBottom: '1px solid var(--n-200)',
+            position: 'sticky',
+            top: 0,
+            zIndex: 10,
+          }}>
+            <div className="flex-gap-3">
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={() => router.back()}
+                style={{ fontSize: 'var(--text-xs)', fontWeight: 'var(--weight-medium)', display: 'flex', alignItems: 'center', gap: 'var(--sp-1)' }}
+              >
+                ← Back
+              </button>
+              <span style={{ color: 'var(--n-300)' }}>|</span>
+              <Link href="/dashboard" className="btn btn-ghost btn-sm" style={{ fontSize: 'var(--text-xs)' }}>
+                Dashboard Home
+              </Link>
+            </div>
+
+            <div className="flex-gap-3">
+              <Link href="/wallet" className="badge badge-primary" style={{ padding: 'var(--sp-1) var(--sp-3)', fontSize: 'var(--text-xs)' }}>
+                {paiseToPoints(profile?.wallet?.balance || 0)} NP
+              </Link>
+              {profile?.role === 'admin' && (
+                <Link href="/admin" className="btn btn-secondary btn-sm" style={{ fontSize: 'var(--text-xs)' }}>
+                  ⬢ Switch to Admin
+                </Link>
+              )}
+              <button onClick={logout} className="btn btn-ghost btn-sm" style={{ fontSize: 'var(--text-xs)', color: 'var(--d-500)' }}>
+                Sign Out
+              </button>
+            </div>
+          </header>
+
+          <main className="main-content" style={{ flex: 1 }}>
+            {children}
+          </main>
+        </div>
       </div>
     </AuthGuard>
   );
