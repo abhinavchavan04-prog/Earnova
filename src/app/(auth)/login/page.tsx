@@ -16,7 +16,7 @@ export default function LoginPage() {
 
   // Redirect if already logged in
   if (user && !loading) {
-    router.push(user.email === 'abhinavchavan04@gmail.com' ? '/admin' : '/dashboard');
+    router.push(user.email?.toLowerCase() === 'abhinavchavan04@gmail.com' ? '/admin' : '/dashboard');
     return null;
   }
 
@@ -27,7 +27,7 @@ export default function LoginPage() {
       await signIn(email, password, rememberMe);
       router.push(email.toLowerCase() === 'abhinavchavan04@gmail.com' ? '/admin' : '/dashboard');
     } catch {
-      // Error is handled by AuthProvider
+      // Error handled cleanly
     } finally {
       setSubmitting(false);
     }
@@ -38,13 +38,8 @@ export default function LoginPage() {
       await signInWithGoogle(rememberMe);
       router.push('/dashboard');
     } catch {
-      // Error is handled by AuthProvider
+      // Error handled cleanly
     }
-  };
-
-  const handleAdminPrefill = () => {
-    setEmail('abhinavchavan04@gmail.com');
-    setPassword('admin123456');
   };
 
   return (
@@ -80,14 +75,9 @@ export default function LoginPage() {
 
       <form className="auth-form" onSubmit={handleSubmit}>
         <div className="input-group">
-          <div className="flex-between">
-            <label className="input-label" htmlFor="email">
-              Email Address
-            </label>
-            <button type="button" onClick={handleAdminPrefill} className="btn btn-ghost btn-sm" style={{ fontSize: 'var(--text-xs)', color: 'var(--p-600)' }}>
-              ⚡ Fill Super Admin Email
-            </button>
-          </div>
+          <label className="input-label" htmlFor="email">
+            Email Address
+          </label>
           <input
             id="email"
             type="email"
@@ -158,15 +148,15 @@ export default function LoginPage() {
         </button>
       </form>
 
-      {/* Subtle preview links */}
+      {/* Experience Platform Demo option for new visitors */}
       <div style={{ marginTop: 'var(--sp-4)', textAlign: 'center', paddingTop: 'var(--sp-3)', borderTop: '1px solid var(--n-200)' }}>
-        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--n-500)' }}>Instant preview: </span>
-        <button type="button" onClick={() => { demoSignIn('subscriber'); router.push('/dashboard'); }} className="btn btn-ghost btn-sm" style={{ fontSize: 'var(--text-xs)' }}>
-          Subscriber View
-        </button>
-        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--n-500)' }}>·</span>
-        <button type="button" onClick={() => { demoSignIn('admin'); router.push('/admin'); }} className="btn btn-ghost btn-sm" style={{ fontSize: 'var(--text-xs)' }}>
-          Admin Panel
+        <button
+          type="button"
+          onClick={() => { demoSignIn('subscriber'); router.push('/dashboard'); }}
+          className="btn btn-ghost btn-sm"
+          style={{ fontSize: 'var(--text-xs)', color: 'var(--p-600)' }}
+        >
+          ✨ Experience Platform Preview
         </button>
       </div>
 
